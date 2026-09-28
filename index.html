@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Flow — Student Productivity Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">§</span>
+      <span class="brand-name">Study Flow</span>
+    </div>
+
+    <nav class="side-nav">
+      <button class="side-link is-active" data-section="overview">Overview</button>
+      <button class="side-link" data-section="tasks">Tasks</button>
+      <button class="side-link" data-section="goals">Goals</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb"></span>
+        </span>
+        <span class="theme-toggle-label">Lamp off</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="today-date">Loading date…</p>
+        <h1 class="page-title" id="greeting">Good to see you.</h1>
+      </div>
+      <div class="streak-badge" title="Consecutive days with a completed task">
+        <span class="streak-flame">◆</span>
+        <span id="streak-count">0</span>
+        <span class="streak-word">day streak</span>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats-row" aria-label="Productivity statistics">
+      <div class="stat-card">
+        <p class="stat-number" id="stat-total">0</p>
+        <p class="stat-label">Total tasks</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-number" id="stat-completed">0</p>
+        <p class="stat-label">Completed</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-number" id="stat-pending">0</p>
+        <p class="stat-label">Pending</p>
+      </div>
+      <div class="stat-card stat-card--accent">
+        <p class="stat-number" id="stat-percent">0%</p>
+        <p class="stat-label">This week's completion</p>
+      </div>
+    </section>
+
+    <div class="content-grid">
+
+      <!-- Tasks -->
+      <section class="panel panel--tasks" id="tasks" aria-labelledby="tasks-heading">
+        <div class="panel-head">
+          <h2 id="tasks-heading">Tasks</h2>
+          <p class="panel-sub">What you're studying, practicing, or turning in.</p>
+        </div>
+
+        <form id="task-form" class="task-form">
+          <input
+            type="text"
+            id="task-input"
+            placeholder="Add a task — e.g. Finish DBMS assignment"
+            aria-label="New task name"
+            autocomplete="off"
+            required
+          >
+          <select id="task-priority" aria-label="Priority">
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+            <option value="Low">Low</option>
+          </select>
+          <button type="submit" class="btn btn-primary">Add task</button>
+        </form>
+
+        <div class="task-controls">
+          <input
+            type="search"
+            id="task-search"
+            placeholder="Search tasks…"
+            aria-label="Search tasks"
+          >
+          <div class="filter-group" role="group" aria-label="Filter tasks by status">
+            <button class="filter-btn is-active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="active">Active</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+          </div>
+        </div>
+
+        <ul id="task-list" class="task-list"></ul>
+
+        <p id="task-empty" class="empty-state" hidden>
+          Nothing here. Add a task above, or clear your search.
+        </p>
+      </section>
+
+      <!-- Right column: Progress + Goals -->
+      <div class="side-column">
+
+        <section class="panel panel--progress" aria-labelledby="progress-heading">
+          <div class="panel-head">
+            <h2 id="progress-heading">This week</h2>
+            <p class="panel-sub">Tasks completed, by day.</p>
+          </div>
+          <div class="week-chart" id="week-chart"></div>
+        </section>
+
+        <section class="panel panel--goals" id="goals" aria-labelledby="goals-heading">
+          <div class="panel-head">
+            <h2 id="goals-heading">Goals</h2>
+            <p class="panel-sub">The bigger targets your tasks add up to.</p>
+          </div>
+
+          <form id="goal-form" class="goal-form">
+            <input
+              type="text"
+              id="goal-input"
+              placeholder="e.g. Solve 50 coding problems"
+              aria-label="New goal name"
+              autocomplete="off"
+              required
+            >
+            <input
+              type="number"
+              id="goal-target"
+              placeholder="Target"
+              min="1"
+              value="10"
+              aria-label="Goal target count"
+              required
+            >
+            <button type="submit" class="btn btn-secondary">Add goal</button>
+          </form>
+
+          <ul id="goal-list" class="goal-list"></ul>
+
+          <p id="goal-empty" class="empty-state" hidden>
+            No goals yet. Set one to track long-term progress.
+          </p>
+        </section>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Task item template -->
+<template id="task-item-template">
+  <li class="task-item" data-id="">
+    <button class="task-check" aria-label="Mark task complete"></button>
+    <div class="task-body">
+      <p class="task-name"></p>
+      <span class="task-priority"></span>
+    </div>
+    <button class="task-delete" aria-label="Delete task">×</button>
+  </li>
+</template>
+
+<!-- Goal item template -->
+<template id="goal-item-template">
+  <li class="goal-item" data-id="">
+    <div class="goal-item-head">
+      <p class="goal-name"></p>
+      <button class="goal-delete" aria-label="Delete goal">×</button>
+    </div>
+    <div class="goal-progress-track">
+      <div class="goal-progress-fill"></div>
+    </div>
+    <div class="goal-item-foot">
+      <span class="goal-count"></span>
+      <div class="goal-step-controls">
+        <button class="goal-step goal-step-minus" aria-label="Decrease progress">−</button>
+        <button class="goal-step goal-step-plus" aria-label="Increase progress">+</button>
+      </div>
+    </div>
+  </li>
+</template>
+
+<script src="script.js"></script>
+</body>
+</html>
